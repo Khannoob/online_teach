@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sysu.guli.service.edu.mapper.CourseMapper">
+<!--    List<CourseVo> selectPageByQueryWrapper(Page<CourseVo> page, QueryWrapper<CourseVo> queryWrapper);-->
+
+    <select id="selectPageByQueryWrapper" resultType="com.sysu.guli.service.edu.entity.vo.CourseVo">
+    SELECT c.`cover`,c.`title`,c.`lesson_num` lessonNum,c.`publish_time` publishTime,
+           c.`view_count` viewCount,c.`id`,c.`price`,c.`buy_count` buyCount,c.`status`,
+           t.`name` teacherName,s1.`title` subjectTitle,s2.`title` subjectParentTitle
+    FROM edu_course c
+    LEFT JOIN edu_teacher t ON c.`teacher_id`=t.`id`
+    LEFT JOIN edu_subject s1 ON c.`subject_id`=s1.`id`
+    LEFT JOIN edu_subject s2 ON c.`subject_parent_id` = s2.`id`
+    ${ew.customSqlSegment}
+    </select>
+<!--    CourseVo selectCourseVoById(QueryWrapper<CourseVo> queryWrapper);-->
+
+    <select id="selectCourseVoById" resultType="com.sysu.guli.service.edu.entity.vo.CourseVo">
+    SELECT c.`cover`,c.`title`,c.`lesson_num` lessonNum,c.`publish_time` publishTime,
+           c.`view_count` viewCount,c.`id`,c.`price`,c.`buy_count` buyCount,c.`status`,
+           t.`name` teacherName,s1.`title` subjectTitle,s2.`title` subjectParentTitle
+    FROM edu_course c
+    LEFT JOIN edu_teacher t ON c.`teacher_id`=t.`id`
+    LEFT JOIN edu_subject s1 ON c.`subject_id`=s1.`id`
+    LEFT JOIN edu_subject s2 ON c.`subject_parent_id` = s2.`id`
+    ${ew.customSqlSegment}
+    </select>
+
+<!--    List<WebCourseVo> getCourseDetail(QueryWrapper<WebCourseVo> queryWrapper);-->
+    <resultMap id="getCourseDetailResultMap" type="com.sysu.guli.service.edu.entity.vo.WebCourseVo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="price" property="price"/>
+        <result column="lesson_num" property="lessonNum"/>
+        <result column="cover" property="cover"/>
+        <result column="buy_count" property="buyCount"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="description" property="description"/>
+        <result column="teacherId" property="teacherId"/>
+        <result column="teacherName" property="teacherName"/>
+        <result column="intro" property="intro"/>
+        <result column="avatar" property="avatar"/>
+        <result column="level" property="level"/>
+        <result column="subjectTitle" property="subjectTitle"/>
+        <result column="subjectId" property="subjectId"/>
+        <result column="subjectParentTitle" property="subjectParentTitle"/>
+        <result column="subjectParentId" property="subjectParentId"/>
+        <collection property="chapters" ofType="com.sysu.guli.service.edu.entity.Chapter">
+            <id column="c_id" property="id"/>
+            <result column="c_title" property="title"/>
+            <result column="c_sort" property="sort"/>
+            <collection property="children" ofType="com.sysu.guli.service.edu.entity.Video">
+                <id column="v_id" property="id"/>
+                <result column="v_title" property="title"/>
+                <result column="v_sid" property="videoSourceId"/>
+                <result column="v_sort" property="sort"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="getCourseDetail" resultMap="getCourseDetailResultMap">
+SELECT t1.id,t1.title,t1.price,t1.lesson_num,t1.cover,t1.buy_count,t1.view_count,
+				t2.description,
+				t3.id teacherId,t3.`name` teacherName,t3.intro,t3.avatar,t3.`level`,
+				t4.id subjectId,t4.title subjectTitle,
+				t5.id subjectParentId,t5.title subjectParentTitle,
+				t6.title c_title,t6.id c_id,t6.sort c_sort,
+				t7.id v_id,t7.title v_title, t7.video_source_id v_sid,t7.sort v_sort
+from edu_course t1
+LEFT JOIN edu_course_description t2 ON t1.id=t2.id
+LEFT JOIN edu_teacher t3 on t1.teacher_id=t3.id
+LEFT JOIN edu_subject t4 ON t1.subject_id=t4.id
+LEFT JOIN edu_subject t5 on t1.subject_parent_id=t5.id
+LEFT JOIN edu_chapter t6 on t6.course_id=t1.id
+LEFT JOIN edu_video t7 on t7.chapter_id=t6.id
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

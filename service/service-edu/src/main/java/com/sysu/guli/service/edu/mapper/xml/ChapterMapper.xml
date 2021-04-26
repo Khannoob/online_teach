@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sysu.guli.service.edu.mapper.ChapterMapper">
+<!--    ChapterVo nestedListByCourseId(@Param("ew") QueryWrapper<ChapterVo> queryWrapper);-->
+
+    <resultMap id="nestedListByCourseIdResultMap" type="com.sysu.guli.service.edu.entity.Chapter">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="title" property="title"/>
+        <result column="sort" property="sort"/>
+
+        <collection property="children" ofType="com.sysu.guli.service.edu.entity.Video">
+            <id column="v_id" property="id"/>
+            <result column="is_free" property="free"/>
+            <result column="play_count" property="playCount"/>
+            <result column="size" property="size"/>
+            <result column="v_title" property="title"/>
+            <result column="v_sort" property="sort"/>
+            <result column="video_original_name" property="videoOriginalName"/>
+            <result column="video_source_id" property="videoSourceId"/>
+        </collection>
+    </resultMap>
+
+    <select id="nestedListByCourseId" resultMap="nestedListByCourseIdResultMap">
+    SELECT t1.id , t1.`course_id` , t1.`title` , t1.`sort`
+        , t2.id v_id , t2.`is_free` , t2.`play_count` , t2.`size` , t2.`size` v_sort ,
+        t2.`title` v_title , t2.`video_original_name` ,t2.`video_source_id`
+    FROM edu_chapter t1
+    LEFT JOIN edu_video t2
+    ON t1.`id` = t2.`chapter_id`
+    ${ew.customSqlSegment}
+    </select>
+</mapper>
